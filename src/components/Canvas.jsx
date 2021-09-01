@@ -1,25 +1,54 @@
-import React from 'react'
+import React, { useState, useEffect, useRef} from 'react'
+import useWindowSize from './WindowSize'
 
-export default class Canvas extends React.Component {
+export default function Canvas(props) {
+  const [drawing, setDrawing] = useState(false);
+  const [width, setWidth] = useState(window.innerWidth);
+  const [height, setHeight] = useState(window.innerHeight);
+
+  const canvasRef = useRef();
+  const ctxRef = useRef();
+
+  const [windowWidth, windowHeight] = useWindowSize(() => {
+    setWidth(window.innerWidth)
+    setHeight(window.innerHeight)
+  })
+  
+  return <canvas
+    ref={canvasRef}
+    width={this.props.width || this.state.width}
+    height={this.props.height || this.state.height}
+    onMouseDown={this.startDrawing}
+    onMouseUp={this.stopDrawing}
+    onMouseOut={this.stopDrawing}
+    onMouseMove={this.handleMouseMove}
+  />
+}
+
+export default function Canvas () {
   constructor(props) {
     super(props)
-    this.canvasRef = React.createRef()
     this.handleMouseMove = this.handleMouseMove.bind(this)
     this.handleResize = this.handleResize.bind(this)
     this.startDrawing = this.startDrawing.bind(this)
     this.stopDrawing = this.stopDrawing.bind(this)
-    this.state = {
-      drawing: false,
-      width: window.innerWidth
-    }
   }
-  componentDidMount() {
-    this.ctx = this.canvasRef.current.getContext('2d')
-    window.addEventListener('resize', this.handleResize);
-  }
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize)
-  }
+  
+  const [windowWidth, windowHeight] = useWindowSize();
+  const [windowSize, setWindowSize ] = useState({
+    width: windowWidth,
+    height: windowHeight
+  })
+  const [drawing, setDrawing] = useState(false);
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    ctx = canvasRef.current.getContext('2d')
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+
   handleMouseMove(e) {
     // actual coordinates
     const coords = [
@@ -35,7 +64,8 @@ export default class Canvas extends React.Component {
     }
   }
   handleResize() {
-    this.setState({ width: window.innerWidth, height: window.innerHeight })
+    setWindowSize(())
+      ({ width: window.innerWidth, height: window.innerHeight })
   }
   startDrawing(e) {
     this.ctx.lineJoin = 'round'
@@ -56,9 +86,9 @@ export default class Canvas extends React.Component {
   }
   render() {
     return (
-      <React.Fragment>
+      <>
         <canvas
-          ref={this.canvasRef}
+          ref={canvasRef}
           width={this.props.width || this.state.width}
           height={this.props.height || this.state.height}
           onMouseDown={this.startDrawing}
@@ -66,7 +96,7 @@ export default class Canvas extends React.Component {
           onMouseOut={this.stopDrawing}
           onMouseMove={this.handleMouseMove}
         />
-      </React.Fragment>
+      </>
     )
   }
 }
