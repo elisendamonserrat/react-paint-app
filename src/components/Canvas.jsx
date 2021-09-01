@@ -9,94 +9,54 @@ export default function Canvas(props) {
   const canvasRef = useRef();
   const ctxRef = useRef();
 
+  useEffect(() => {
+    ctxRef.current = canvasRef.current.getContext('2d')
+  }, [])
+
   const [windowWidth, windowHeight] = useWindowSize(() => {
     setWidth(window.innerWidth)
     setHeight(window.innerHeight)
   })
   
-  return <canvas
-    ref={canvasRef}
-    width={this.props.width || this.state.width}
-    height={this.props.height || this.state.height}
-    onMouseDown={this.startDrawing}
-    onMouseUp={this.stopDrawing}
-    onMouseOut={this.stopDrawing}
-    onMouseMove={this.handleMouseMove}
-  />
-}
-
-export default function Canvas () {
-  constructor(props) {
-    super(props)
-    this.handleMouseMove = this.handleMouseMove.bind(this)
-    this.handleResize = this.handleResize.bind(this)
-    this.startDrawing = this.startDrawing.bind(this)
-    this.stopDrawing = this.stopDrawing.bind(this)
-  }
-  
-  const [windowWidth, windowHeight] = useWindowSize();
-  const [windowSize, setWindowSize ] = useState({
-    width: windowWidth,
-    height: windowHeight
-  })
-  const [drawing, setDrawing] = useState(false);
-  const canvasRef = useRef(null)
-
-  useEffect(() => {
-    ctx = canvasRef.current.getContext('2d')
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-
-  handleMouseMove(e) {
+  function handleMouseMove(e) {
     // actual coordinates
     const coords = [
-      e.clientX - this.canvasRef.current.offsetLeft,
-      e.clientY - this.canvasRef.current.offsetTop
+      e.clientX - canvasRef.current.offsetLeft,
+      e.clientY - canvasRef.current.offsetTop
     ]
-    if (this.state.drawing) { 
-      this.ctx.lineTo(...coords)
-      this.ctx.stroke()
+    if (drawing) { 
+      ctxRef.current.lineTo(...coords)
+      ctxRef.current.stroke()
     }
-    if (this.props.handleMouseMove) {
-        this.props.handleMouseMove(...coords)
+    if (props.handleMouseMove) {
+        props.handleMouseMove(...coords)
     }
   }
-  handleResize() {
-    setWindowSize(())
-      ({ width: window.innerWidth, height: window.innerHeight })
-  }
-  startDrawing(e) {
-    this.ctx.lineJoin = 'round'
-    this.ctx.lineCap = 'round'
-    this.ctx.lineWidth = 10
-    this.ctx.strokeStyle = this.props.color
-    this.ctx.beginPath();
+  function startDrawing(e) {
+    ctxRef.current.lineJoin = 'round'
+    ctxRef.current.lineCap = 'round'
+    ctxRef.current.lineWidth = 10
+    ctxRef.current.strokeStyle = props.color
+    ctxRef.current.beginPath();
     // actual coordinates
-    this.ctx.moveTo(
-      e.clientX - this.canvasRef.current.offsetLeft,
-      e.clientY - this.canvasRef.current.offsetTop
+    ctxRef.current.moveTo(
+      e.clientX - canvasRef.current.offsetLeft,
+      e.clientY - canvasRef.current.offsetTop
     )
-    this.setState({ drawing: true })
+    setDrawing(true)
   }
-  stopDrawing() {
-    this.ctx.closePath()
-    this.setState({ drawing: false })
+  function stopDrawing() {
+    ctxRef.current.closePath()
+    setDrawing(false)
   }
-  render() {
-    return (
-      <>
-        <canvas
-          ref={canvasRef}
-          width={this.props.width || this.state.width}
-          height={this.props.height || this.state.height}
-          onMouseDown={this.startDrawing}
-          onMouseUp={this.stopDrawing}
-          onMouseOut={this.stopDrawing}
-          onMouseMove={this.handleMouseMove}
-        />
-      </>
-    )
-  }
+  
+  return <canvas
+    ref={canvasRef}
+    width={props.width || width}
+    height={props.height || height}
+    onMouseDown={startDrawing}
+    onMouseUp={stopDrawing}
+    onMouseOut={stopDrawing}
+    onMouseMove={handleMouseMove}
+  />
 }
