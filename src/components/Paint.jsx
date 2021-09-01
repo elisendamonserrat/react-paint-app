@@ -4,6 +4,7 @@ import Canvas from './Canvas'
 import ColorPicker from './ColorPicker'
 import WindowSize from './WindowSize'
 import randomColor from 'randomcolor'
+import RefreshButton from './RefreshButton';
 
 export default function Paint() {
   const [colors, setColors] = useState([])
@@ -36,6 +37,7 @@ export default function Paint() {
             activeColor={activeColor}
             setActiveColor={setActiveColor}
           />
+          <RefreshButton cb={getColors}/>
         </div>
       </header>
       {activeColor && (
